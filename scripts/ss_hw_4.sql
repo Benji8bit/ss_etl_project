@@ -3,6 +3,36 @@
 -- Time: 2:15:22 AM
 -------------------------------
 
+
+/*
+ "Интеграция с внешними системами"
+ 
+Параметры подключения к Postgres:
+        Хост          	             Порт   	   База данных    	       Логин // Пароль         
+    192.168.214.212     	         5432	         postgres	           intern // intern
+
+1. Необходимо создать внешние таблицы в Greenplum c использованием протокола PXF для доступа к данным следующих таблиц базы Postgres: 
+gp.plan 
+gp.sales 
+2. Необходимо создать внешние таблицы в Greenplum c использованием протокола gpfdist для доступа к данным следующих файлов CSV: 
+price 
+chanel 
+product 
+region 
+Установщик утилиты "gpfdist" прикреплен ниже.
+ 
+chanel.csv chanel.csv17 January 2024, 13:16
+ 
+greenplum-db-clients-6.20.0-x86_64.msi greenplum-db-clients-6.20.0-x86_64.msi8 May 2023, 12:08
+ 
+price.csv price.csv17 January 2024, 13:16
+ 
+product.csv product.csv17 January 2024, 13:16
+ 
+region.csv region.csv17 January 2024, 13:16
+ */
+
+
 SET SEARCH_PATH TO std5_80;
 
 CREATE EXTERNAL TABLE std5_80.plan_ext ( 
@@ -18,22 +48,6 @@ FORMAT 'CUSTOM' (FORMATTER='pxfwritable_import')
 ENCODING 'UTF8';
 
 DROP EXTERNAL TABLE std5_80.plan_ext;
-
-/*
- PXF CONNECTION STRING: pxf://gp.plan?PROFILE=Jdbc&JDBC_DRIVER=org.postgresql.Driver&DB_URL=jdbc:postgresql://192.168.214.212:5432/postgres&USER=intern&PASS=intern
-EXTERNAL TABLE IS: CREATE EXTERNAL TABLE std5_80.plan_ext(LIKE std5_80.plan)
-			LOCATION ('pxf://gp.plan?PROFILE=Jdbc&JDBC_DRIVER=org.postgresql.Driver&DB_URL=jdbc:postgresql://192.168.214.212:5432/postgres&USER=intern&PASS=intern'
-			) ON ALL
-			FORMAT 'CUSTOM' (FORMATTER='pxfwritable_import')
-			ENCODING 'UTF-8'
-TEMP TABLE IS: DROP TABLE IF EXISTS std5_80.plan_tmp;
-			CREATE TABLE std5_80.plan_tmp (LIKE std5_80.plan) with (appendonly=true, orientation=column, compresstype=zstd, compresslevel=1) DISTRIBUTED BY (region);
-table "plan_tmp" does not exist, skipping
-INSERTED ROWS: 0
-EXCHANGE PARTITION SCRIPT: ALTER TABLE std5_80.plan EXCHANGE PARTITION FOR (DATE '1997-02-01') WITH TABLE std5_80.plan_tmp WITH VALIDATION
-
- **/
-
 
 SELECT *
 FROM std5_80.plan_ext
